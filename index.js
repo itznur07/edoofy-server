@@ -23,6 +23,16 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    /** collection from database */
+    const usersCollection = client.db("Edoofy").collection("users");
+
+    /** api communication with client side */
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
