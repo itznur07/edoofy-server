@@ -25,6 +25,7 @@ async function run() {
   try {
     /** collection from database */
     const usersCollection = client.db("Edoofy").collection("users");
+    const classesCollection = client.db("Edoofy").collection("classes");
 
     /** api communication with client side */
     app.get("/users", async (req, res) => {
@@ -35,6 +36,12 @@ async function run() {
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
+      res.send(result);
+    });
+
+    app.post("/classes", async (req, res) => {
+      const classInfo = req.body;
+      const result = await classesCollection.insertOne(classInfo);
       res.send(result);
     });
 
