@@ -4,33 +4,32 @@ const port = process.env.PORT || 3000;
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
-const jwt = require("jsonwebtoken");
 
 /** Middlewares */
 app.use(cors());
 app.use(express.json());
 
 /** VERIFY JWT TOKEN BASED AUTHENTIVCATION */
-const verifyJWT = (req, res, next) => {
-  const authorization = req.headers.authorization;
-  /** Check token authorization */
-  if (!authorization) {
-    return res
-      .status(401)
-      .send({ error: true, message: "unauthorized access" });
-  }
-  const token = authorization.split(" ")[1];
-  /** Token verify */
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
-    if (error) {
-      return res
-        .status(403)
-        .send({ error: true, message: "unauthorized access" });
-    }
-    req.decoded = decoded;
-    next();
-  });
-};
+// const verifyJWT = (req, res, next) => {
+//   const authorization = req.headers.authorization;
+//   /** Check token authorization */
+//   if (!authorization) {
+//     return res
+//       .status(401)
+//       .send({ error: true, message: "unauthorized access" });
+//   }
+//   const token = authorization.split(" ")[1];
+//   /** Token verify */
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (error, decoded) => {
+//     if (error) {
+//       return res
+//         .status(403)
+//         .send({ error: true, message: "unauthorized access" });
+//     }
+//     req.decoded = decoded;
+//     next();
+//   });
+// };
 
 /** Mongodb client and database connection */
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@todos.ukwfq5e.mongodb.net/?retryWrites=true&w=majority`;
@@ -51,7 +50,7 @@ async function run() {
     const classesCollection = client.db("Edoofy").collection("classes");
 
     /** api communication with client side */
-    app.get("/users", verifyJWT, async (req, res) => {
+    app.get("/users", async (req, res) => {
       const decoded = req.decoded;
       if (decoded?.email !== req.query.email) {
         return res.send({ error: 1, message: "Forbidden access" });
@@ -60,7 +59,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/classes", verifyJWT, async (req, res) => {
+    app.get("/classes", async (req, res) => {
       const decoded = req.decoded;
       if (decoded?.email !== req.query.email) {
         return res.send({ error: 1, message: "Forbidden access" });
@@ -70,13 +69,13 @@ async function run() {
     });
 
     /** JWT Oparetion */
-    app.post("/jwt", (req, res) => {
-      const user = req.body;
-      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "1h",
-      });
-      res.send({ token });
-    });
+    // app.post("/jwt", (req, res) => {
+    //   const user = req.body;
+    //   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+    //     expiresIn: "1h",
+    //   });
+    //   res.send({ token });
+    // });
 
     app.post("/users", async (req, res) => {
       const user = req.body;
