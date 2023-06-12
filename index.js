@@ -63,6 +63,35 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/classes/:id", async (req, res) => {
+      if (req.body.feedback) {
+        // const id = req.params.id;
+        // console.log(id);
+        // const query = { _id: new ObjectId(id) };
+        // const updatedFeedback = req.body;
+        // const updateInfo = {
+        //   $set: {
+        //     feedback: updatedFeedback.feedback,
+        //   },
+        // };
+        // const result = await classesCollection.updateOne(query, updateInfo);
+        // res.send(result);
+      } else if (req.body.status) {
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const updatedStatus = req.body;
+        const updateInfo = {
+          $set: {
+            status: updatedStatus.status,
+          },
+        };
+        const result = await classesCollection.updateOne(query, updateInfo);
+        res.send(result);
+      } else {
+        ("");
+      }
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
