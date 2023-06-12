@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 /** Middlewares */
@@ -33,6 +33,16 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/classes", async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { instructorEmail: email };
+      const result = await classesCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/users", async (req, res) => {
       const user = req.body;
       const result = await usersCollection.insertOne(user);
@@ -45,13 +55,16 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/classes", async (req, res) => {
-      const email = req.query.email;
-      if (!email) {
-        res.send([]);
-      }
-      const query = { instructorEmail: email };
-      const result = await classesCollection.find(query).toArray();
+    app.patch("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedRole = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateInfo = {
+        $set: {
+          role: updatedRole.role,
+        },
+      };
+      const result = await usersCollection.updateOne(query, updateInfo);
       res.send(result);
     });
 
