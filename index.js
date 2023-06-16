@@ -44,14 +44,22 @@ mongoose.connect(atlasUrl, {
 
 const users = mongoose.model("users", new mongoose.Schema({}));
 const classes = mongoose.model("classes", new mongoose.Schema({}));
-const selectedClass = mongoose.model("selectedClass", new mongoose.Schema({}));
+const selectedClasses = mongoose.model(
+  "selectedClasses",
+  new mongoose.Schema({})
+);
+// const enrolledClass = mongoose.model("selectedClass", new mongoose.Schema({}));
 
 /** api communication with client side */
 app.get("/users", async (req, res) => {
   const result = await users.find();
   res.send(result);
 });
-5;
+
+app.get("/selectedClasses", async (req, res) => {
+  const result = await classes.find();
+  res.send(result);
+});
 
 app.get("/classes", async (req, res) => {
   const decoded = req.decoded;
@@ -83,12 +91,11 @@ app.post("/classes", async (req, res) => {
   res.send(result);
 });
 
-app.post("/selectedClass", async (req, res) => {
-  const classInfo = new selectedClass(req.body);
+app.post("/selectedClasses", async (req, res) => {
+  const classInfo = new selectedClasses(req.body);
   const result = await classInfo.save();
   res.send(result);
 });
-
 
 app.patch("/users/:id", async (req, res) => {
   const id = req.params.id;
