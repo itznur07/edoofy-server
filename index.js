@@ -44,12 +44,14 @@ mongoose.connect(atlasUrl, {
 
 const users = mongoose.model("users", new mongoose.Schema({}));
 const classes = mongoose.model("classes", new mongoose.Schema({}));
+const selectedClass = mongoose.model("selectedClass", new mongoose.Schema({}));
 
 /** api communication with client side */
 app.get("/users", async (req, res) => {
   const result = await users.find();
   res.send(result);
 });
+5;
 
 app.get("/classes", async (req, res) => {
   const decoded = req.decoded;
@@ -70,27 +72,28 @@ app.get("/classes", async (req, res) => {
 // });
 
 app.post("/users", async (req, res) => {
-  const user = req.body;
-  const result = await usersCollection.insertOne(user);
+  const user = new users(req.body);
+  const result = await user.save();
   res.send(result);
 });
 
 app.post("/classes", async (req, res) => {
-  const classInfo = req.body;
-  const result = await classesCollection.insertOne(classInfo);
+  const classInfo = new classes(req.body);
+  const result = await classInfo.save();
   res.send(result);
 });
+
+app.post("/selectedClass", async (req, res) => {
+  const classInfo = new selectedClass(req.body);
+  const result = await classInfo.save();
+  res.send(result);
+});
+
 
 app.patch("/users/:id", async (req, res) => {
   const id = req.params.id;
   const updatedRole = req.body;
-  const query = { _id: new ObjectId(id) };
-  const updateInfo = {
-    $set: {
-      role: updatedRole.role,
-    },
-  };
-  const result = await usersCollection.updateOne(query, updateInfo);
+  const result = await users.findByIdAndUpdate(id, { role: updatedRole.role });
   res.send(result);
 });
 
@@ -98,25 +101,13 @@ app.patch("/classes/:id", async (req, res) => {
   if (req.body.feedback) {
     // const id = req.params.id;
     // console.log(id);
-    // const query = { _id: new ObjectId(id) };
-    // const updatedFeedback = req.body;
-    // const updateInfo = {
-    //   $set: {
-    //     feedback: updatedFeedback.feedback,
-    //   },
-    // };
-    // const result = await classesCollection.updateOne(query, updateInfo);
+    // const result = await Class.findByIdAndUpdate(id, { feedback: req.body.feedback });
     // res.send(result);
   } else if (req.body.status) {
     const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const updatedStatus = req.body;
-    const updateInfo = {
-      $set: {
-        status: updatedStatus.status,
-      },
-    };
-    const result = await classesCollection.updateOne(query, updateInfo);
+    const result = await classes.findByIdAndUpdate(id, {
+      status: req.body.status,
+    });
     res.send(result);
   } else {
     ("");
