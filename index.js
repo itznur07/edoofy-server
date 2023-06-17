@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
 const cors = require("cors");
@@ -143,6 +143,13 @@ async function run() {
       } else {
         ("");
       }
+    });
+
+    app.delete("/selectedclasses/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await selectedClassCollection.deleteOne(query);
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection
