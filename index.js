@@ -7,7 +7,7 @@ const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require("dotenv").config();
 
 /** Middlewares */
-app.use(cors("*"));
+app.use(cors());
 app.use(express.json());
 
 /** VERIFY JWT TOKEN BASED AUTHENTIVCATION */
@@ -52,7 +52,6 @@ async function run() {
     const selectedClassCollection = client
       .db("Edoofy")
       .collection("selectedclasses");
-    const paymentCollection = client.db("Edoofy").collection("payments");
 
     /** api communication with client side */
     app.get("/users", async (req, res) => {
@@ -109,38 +108,6 @@ async function run() {
         res.status(400).json({ message: "Data already exists" });
         return;
       }
-    });
-
-    /** Create Payment Intent */
-    app.post("/create-payment-intent", async (req, res) => {
-      const { price } = req.body;
-      const amount = price * 100;
-
-      // Create a PaymentIntent with the order amount and currency
-      const paymentIntent = await stripe.paymentIntents.create({
-        amount: calculateOrderAmount(amount),
-        currency: "usd",
-        payment_method_types: ["card"],
-      });
-
-      res.send({
-        clientSecret: paymentIntent.client_secret,
-      });
-    });
-
-    /** Payment Intent Ends Here */
-
-    // payment related api
-    app.post("/payments", async (req, res) => {
-      const payment = req.body;
-      const insertResult = await paymentCollection.insertOne(payment);
-
-      const query = {
-        _id: { $in: payment.cartItems.map((id) => new ObjectId(id)) },
-      };
-      const deleteResult = await selectedClassCollection.deleteMany(query);
-
-      res.send({ insertResult, deleteResult });
     });
 
     app.patch("/users/:id", async (req, res) => {
